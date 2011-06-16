@@ -9,6 +9,7 @@ HEADERS = \
 
 SOURCES = \
 	args.c \
+	ada.c \
 	ant.c \
 	asm.c \
 	asp.c \
@@ -72,6 +73,7 @@ REGEX_HEADERS = gnu_regex/regex.h
 
 OBJECTS = \
 	args.$(OBJEXT) \
+	ada.$(OBJEXT) \
 	ant.$(OBJEXT) \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
