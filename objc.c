@@ -52,7 +52,7 @@ typedef enum {
 static kindOption ObjcKinds[] = {
 	{TRUE, 'i', "interface", "class interface"},
 	{TRUE, 'I', "implementation", "class implementation"},
-	{TRUE, 'p', "protocol", "Protocol"},
+	{TRUE, 'P', "protocol", "Protocol"},
 	{TRUE, 'm', "method", "Object's method"},
 	{TRUE, 'c', "class", "Class' method"},
 	{TRUE, 'v', "var", "Global variable"},
@@ -432,16 +432,16 @@ typedef void (*parseNext) (vString * const ident, objcToken what);
 /********** Helpers */
 /* This variable hold the 'parser' which is going to
  * handle the next token */
-parseNext toDoNext;
+static parseNext toDoNext;
 
 /* Special variable used by parser eater to
  * determine which action to put after their
  * job is finished. */
-parseNext comeAfter;
+static parseNext comeAfter;
 
 /* Used by some parsers detecting certain token
  * to revert to previous parser. */
-parseNext fallback;
+static parseNext fallback;
 
 
 /********** Grammar */
@@ -452,6 +452,9 @@ static vString *tempName = NULL;
 static vString *parentName = NULL;
 static objcKind parentType = K_INTERFACE;
 
+static unsigned long tokenLine;
+static fpos_t filePosition;     /* file position of line containing tag */
+static void parseMethodsImplemName (vString * const ident, objcToken what);
 /* used to prepare tag for OCaml, just in case their is a need to
  * add additional information to the tag. */
 static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
@@ -460,6 +463,12 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 	tag->kindName = ObjcKinds[kind].name;
 	tag->kind = ObjcKinds[kind].letter;
 
+	if (toDoNext == &parseMethodsImplemName)
+	{
+		tag->lineNumber = tokenLine;
+		tag->filePosition = filePosition;
+	}
+
 	if (parentName != NULL)
 	{
 		tag->extensionFields.scope[0] = ObjcKinds[parentType].name;
@@ -467,13 +476,13 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 	}
 }
 
-void pushEnclosingContext (const vString * parent, objcKind type)
+static void pushEnclosingContext (const vString * parent, objcKind type)
 {
 	vStringCopy (parentName, parent);
 	parentType = type;
 }
 
-void popEnclosingContext ()
+static void popEnclosingContext (void)
 {
 	vStringClear (parentName);
 }
@@ -487,7 +496,7 @@ static void addTag (vString * const ident, int kind)
 	makeTagEntry (&toCreate);
 }
 
-objcToken waitedToken, fallBackToken;
+static objcToken waitedToken, fallBackToken;
 
 /* Ignore everything till waitedToken and jump to comeAfter.
  * If the "end" keyword is encountered break, doesn't remember
@@ -549,14 +558,12 @@ static void parseFields (vString * const ident, objcToken what)
 		comeAfter = &parseFields;
 		break;
 
-		// we got an identifier, keep track
-		// of it
+		/* we got an identifier, keep track of it */
 	case ObjcIDENTIFIER:
 		vStringCopy (tempName, ident);
 		break;
 
-		// our last kept identifier must be our
-		// variable name =)
+		/* our last kept identifier must be our variable name =) */
 	case Tok_semi:
 		addTag (tempName, K_FIELD);
 		vStringClear (tempName);
@@ -596,7 +603,7 @@ static void parseMethodsName (vString * const ident, objcToken what)
 
 	case Tok_CurlL:
 	case Tok_semi:
-		// method name is not simple
+		/* method name is not simple */
 		if (vStringLength (fullMethodName) != '\0')
 		{
 			addTag (fullMethodName, methodKind);
@@ -632,12 +639,17 @@ static void parseMethodsImplemName (vString * const ident, objcToken what)
 		break;
 
 	case ObjcIDENTIFIER:
+		if (vStringLength (fullMethodName) == '\0')
+		{
+			tokenLine = getInputLineNumber();
+			filePosition = getInputFilePosition();
+		}
 		vStringCopy (prevIdent, ident);
 		break;
 
 	case Tok_CurlL:
 	case Tok_semi:
-		// method name is not simple
+		/* method name is not simple */
 		if (vStringLength (fullMethodName) != '\0')
 		{
 			addTag (fullMethodName, methodKind);
@@ -696,17 +708,16 @@ static void parseProperty (vString * const ident, objcToken what)
 		waitedToken = Tok_PARR;
 		break;
 
-		// we got an identifier, keep track
-		// of it
+		/* we got an identifier, keep track of it */
 	case ObjcIDENTIFIER:
 		vStringCopy (tempName, ident);
 		break;
 
-		// our last kept identifier must be our
-		// variable name =)
+		/* our last kept identifier must be our variable name =) */
 	case Tok_semi:
 		addTag (tempName, K_PROPERTY);
 		vStringClear (tempName);
+		toDoNext = &parseMethods;
 		break;
 
 	default:
@@ -799,8 +810,9 @@ static void parseStructMembers (vString * const ident, objcToken what)
 		vStringClear (tempName);
 		break;
 
-		// some types are complex, the only one
-		// we will loose is the function type.
+		/* some types are complex, the only one
+		 * we will loose is the function type.
+		 */
 	case Tok_CurlL:	/* '{' */
 	case Tok_PARL:	/* '(' */
 	case Tok_SQUAREL:	/* '[' */
