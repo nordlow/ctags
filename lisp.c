@@ -25,31 +25,35 @@ typedef enum {
 	LISP_K_FUNCTION,
 	LISP_K_ALIAS,
 	LISP_K_VARIABLE,
+	LISP_K_CUSTOMIZABLE,
 	LISP_K_CONSTANT,
 	LISP_K_MACRO,
 	LISP_K_GROUP,
 	LISP_K_ADVICE,
-	LISP_K_FACE
+	LISP_K_FACE,
+	LISP_K_IMAGE,
+	LISP_K_TYPE
 } lispKind;
 
 static kindOption LispKinds [] = {
 	{ TRUE, 'f', "function", "functions" }, /* defun, defun* */
 	{ TRUE, 'a', "alias", "aliases" },      /* defalias */
-	{ TRUE, 'v', "variable", "variables" }, /* defvar, defvaralias */
+	{ TRUE, 'v', "variable", "variables" }, /* defvar, defvaralias, defvar-local */
+	{ TRUE, 'C', "custom",    "customs"  }, /* defcustom * */
 	{ TRUE, 'c', "constant", "constants" }, /* defconst, defconst-mode-local */
 	{ TRUE, 'm', "macro",    "macros"  },   /* defmacro, defmacro* */
 	{ TRUE, 'g', "group",    "groups"  },   /* defgroup * */
 	{ TRUE, 'A', "advice",    "advice"  },  /* defadvice * */
 	{ TRUE, 'E', "face",    "faces"  },     /* defface * */
+	{ TRUE, 'i', "image",    "images"  },   /* defimage * */
+	{ TRUE, 't', "type",    "types"  },     /* deftype * */
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
 
-/*
- * lisp tag functions
- *  look for (def or (DEF, quote or QUOTE
+/*! Look for (def or (DEF.
  */
 static int L_isdef (const unsigned char *strp)
 {
@@ -58,6 +62,8 @@ static int L_isdef (const unsigned char *strp)
            (strp [3] == 'f' || strp [3] == 'F'));
 }
 
+/*! Look quote or QUOTE.
+ */
 static int L_isquote (const unsigned char *strp)
 {
 	return ( (*(++strp) == 'q' || *strp == 'Q') &&
