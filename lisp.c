@@ -49,17 +49,16 @@ static kindOption LispKinds [] = {
 	{ TRUE, 't', "type",    "types"  },     /* deftype * */
 };
 
-/*
-*   FUNCTION DEFINITIONS
-*/
-
 /*! Look for (def or (DEF.
  */
 static int L_isdef (const unsigned char *strp)
 {
-	return ( (strp [1] == 'd' || strp [1] == 'D') &&
-           (strp [2] == 'e' || strp [2] == 'E') &&
-           (strp [3] == 'f' || strp [3] == 'F'));
+	return ( (strp [1] == 'd' ||
+            strp [1] == 'D') &&
+           (strp [2] == 'e' ||
+            strp [2] == 'E') &&
+           (strp [3] == 'f' ||
+            strp [3] == 'F'));
 }
 
 /*! Look quote or QUOTE.
