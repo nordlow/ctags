@@ -7,3 +7,5 @@ ctags-exuberant
 .undo
 autom4te.cache
 config.h.in
+tags
+TAGS
