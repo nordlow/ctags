@@ -28,7 +28,7 @@ SLINK	= ln -s
 STRIP	= strip
 CC	= gcc
 DEFS	= -DHAVE_CONFIG_H
-CFLAGS	= -O3 -g
+CFLAGS	= -O3 -lto
 LDFLAGS	= -s
 LIBS	=
 EXEEXT	=
@@ -191,14 +191,17 @@ uninstall-ctags:
 uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
+ECTAGS_LANGS = Make,C,C++,Pascal,Sh,Ada,D,Lisp,Go,Protobuf
+TAGS_FILES = *.[ch] Makefile
+
 #
 # miscellaneous rules
 #
 tags: $(CTAGS_EXEC)
-	./$(CTAGS_EXEC) $(srcdir)/*
+	./$(CTAGS_EXEC) --sort=yes --links=no --excmd=number --languages=$(ECTAGS_LANGS) --extra=+f --file-scope=yes --fields=afikmsSt --totals=yes $(TAGS_FILES)
 
 TAGS: $(CTAGS_EXEC)
-	./$(CTAGS_EXEC) -e $(srcdir)/*
+	./$(CTAGS_EXEC) --sort=yes --links=no --excmd=number --languages=$(ECTAGS_LANGS) --extra=+f --file-scope=yes --fields=afikmsSt --totals=yes -e $(TAGS_FILES)
 
 clean:
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB)

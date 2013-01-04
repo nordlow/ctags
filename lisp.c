@@ -22,19 +22,25 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_FUNCTION,
-	K_ALIAS,
-	K_VARIABLE,
-	K_CONSTANT,
-	K_MACRO
+	LISP_K_FUNCTION,
+	LISP_K_ALIAS,
+	LISP_K_VARIABLE,
+	LISP_K_CONSTANT,
+	LISP_K_MACRO,
+	LISP_K_GROUP,
+	LISP_K_ADVICE,
+	LISP_K_FACE
 } lispKind;
 
 static kindOption LispKinds [] = {
-	{ TRUE, 'f', "function", "functions" },
-	{ TRUE, 'a', "alias", "aliases" },
-	{ TRUE, 'v', "variable", "variables" },
-	{ TRUE, 'c', "constant", "constants" },
-	{ TRUE, 'm', "macro",    "macros"  },
+	{ TRUE, 'f', "function", "functions" }, /* defun, defun* */
+	{ TRUE, 'a', "alias", "aliases" },      /* defalias */
+	{ TRUE, 'v', "variable", "variables" }, /* defvar, defvaralias */
+	{ TRUE, 'c', "constant", "constants" }, /* defconst, defconst-mode-local */
+	{ TRUE, 'm', "macro",    "macros"  },   /* defmacro, defmacro* */
+	{ TRUE, 'g', "group",    "groups"  },   /* defgroup * */
+	{ TRUE, 'A', "advice",    "advice"  },  /* defadvice * */
+	{ TRUE, 'E', "face",    "faces"  },     /* defface * */
 };
 
 /*
@@ -54,12 +60,12 @@ static int L_isdef (const unsigned char *strp)
 
 static int L_isquote (const unsigned char *strp)
 {
-	return ( (*(++strp) == 'q' || *strp == 'Q')
-		  && (*(++strp) == 'u' || *strp == 'U')
-		  && (*(++strp) == 'o' || *strp == 'O')
-		  && (*(++strp) == 't' || *strp == 'T')
-		  && (*(++strp) == 'e' || *strp == 'E')
-		  && isspace (*(++strp)));
+	return ( (*(++strp) == 'q' || *strp == 'Q') &&
+           (*(++strp) == 'u' || *strp == 'U') &&
+           (*(++strp) == 'o' || *strp == 'O') &&
+           (*(++strp) == 't' || *strp == 'T') &&
+           (*(++strp) == 'e' || *strp == 'E') &&
+           isspace (*(++strp)));
 }
 
 static void L_getit (vString *const name, const unsigned char *dbp)
@@ -79,7 +85,7 @@ static void L_getit (vString *const name, const unsigned char *dbp)
 	vStringTerminate (name);
 
 	if (vStringLength (name) > 0)
-		makeSimpleTag (name, LispKinds, K_FUNCTION);
+		makeSimpleTag (name, LispKinds, LISP_K_FUNCTION);
 	vStringClear (name);
 }
 
