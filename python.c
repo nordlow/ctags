@@ -143,6 +143,7 @@ static void makeFunctionTag (vString *const function,
 	tag.kindName = "function";
 	tag.kind = 'f';
 	/* tag.extensionFields.arglist = arglist; */
+	tag.extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
@@ -726,7 +727,7 @@ static void findPythonTags (void)
 			find_triple_end(cp, &longStringLiteral);
 			continue;
 		}
-		
+
 		checkParent(nesting_levels, indent, parent);
 
 		/* Deal with multiline string start. */
@@ -823,7 +824,7 @@ static void findPythonTags (void)
 				/* skip variables in methods */
 				if (! parent_is_class && vStringLength(parent) > 0)
 					continue;
- 
+
 				makeVariableTag (name, parent);
 			}
 		}
