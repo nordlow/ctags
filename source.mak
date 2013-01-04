@@ -41,6 +41,7 @@ SOURCES = \
 	ocaml.c \
 	options.c \
 	parse.c \
+	parrot.c \
 	pascal.c \
 	perl.c \
 	php.c \
@@ -109,6 +110,7 @@ OBJECTS = \
 	ocaml.$(OBJEXT) \
 	options.$(OBJEXT) \
 	parse.$(OBJEXT) \
+	parrot.$(OBJEXT) \
 	pascal.$(OBJEXT) \
 	perl.$(OBJEXT) \
 	php.$(OBJEXT) \

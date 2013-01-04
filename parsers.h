@@ -45,6 +45,7 @@
 	MatLabParser, \
 	ObjcParser , \
 	OcamlParser, \
+  ParrotParser,                             \
 	PascalParser, \
 	PerlParser, \
 	PhpParser, \
