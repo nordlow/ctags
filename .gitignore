@@ -1,1 +1,8 @@
 *.o
+Makefile
+config.h
+config.log
+config.status
+ctags
+.undo
+autom4te.cache

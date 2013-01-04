@@ -27,11 +27,13 @@
 	CppParser, \
 	CsharpParser, \
 	CobolParser, \
+  DParser, \
 	DosBatchParser, \
 	EiffelParser, \
 	ErlangParser, \
 	FlexParser, \
 	FortranParser, \
+  GoParser,  \
 	HtmlParser, \
 	JavaParser, \
 	JavaScriptParser, \
