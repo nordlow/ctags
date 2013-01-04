@@ -58,6 +58,7 @@
     SchemeParser,                               \
     ShParser,                                   \
     SlangParser,                                \
+    SmalltalkParser,                                  \
     SmlParser,                                  \
     SqlParser,                                  \
     TclParser,                                  \

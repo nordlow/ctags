@@ -56,6 +56,7 @@ SOURCES = \
 	scheme.c \
 	sh.c \
 	slang.c \
+	smalltalk.c \
 	sml.c \
 	sort.c \
 	sql.c \
@@ -127,6 +128,7 @@ OBJECTS = \
 	scheme.$(OBJEXT) \
 	sh.$(OBJEXT) \
 	slang.$(OBJEXT) \
+	smalltalk.$(OBJEXT) \
 	sml.$(OBJEXT) \
 	sort.$(OBJEXT) \
 	sql.$(OBJEXT) \
