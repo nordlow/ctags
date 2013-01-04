@@ -32,6 +32,7 @@
 	EiffelParser, \
 	ErlangParser, \
 	FlexParser, \
+  FalconParser,                               \
 	FortranParser, \
   GoParser,  \
 	HtmlParser, \
