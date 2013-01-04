@@ -19,6 +19,7 @@
     AdaParser, \
 	AntParser, \
 	AsmParser, \
+  AsnParser,                                \
 	AspParser, \
 	AwkParser, \
 	BasicParser, \

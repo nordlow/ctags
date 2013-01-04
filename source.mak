@@ -12,6 +12,7 @@ SOURCES = \
 	ada.c \
 	ant.c \
 	asm.c \
+	asn.c \
 	asp.c \
 	awk.c \
 	basic.c \
@@ -79,6 +80,7 @@ OBJECTS = \
 	ada.$(OBJEXT) \
 	ant.$(OBJEXT) \
 	asm.$(OBJEXT) \
+	asn.$(OBJEXT) \
 	asp.$(OBJEXT) \
 	awk.$(OBJEXT) \
 	basic.$(OBJEXT) \
