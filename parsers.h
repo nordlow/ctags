@@ -15,56 +15,57 @@
 #define _PARSERS_H
 
 /* Add the name of any new parser definition function here */
-#define PARSER_LIST \
-    AdaParser, \
-	AntParser, \
-	AsmParser, \
-  AsnParser,                                \
-	AspParser, \
-	AwkParser, \
-	BasicParser, \
-	BetaParser, \
-	CParser, \
-	CppParser, \
-	CsharpParser, \
-	CobolParser, \
-  DParser, \
-	DosBatchParser, \
-	EiffelParser, \
-	ErlangParser, \
-	FlexParser, \
-  FalconParser,                               \
-	FortranParser, \
-  GoParser,  \
-	HtmlParser, \
-	JavaParser, \
-	JavaScriptParser, \
-	LispParser, \
-	LuaParser, \
-	MakefileParser, \
-	MatLabParser, \
-	ObjcParser , \
-	OcamlParser, \
-  ParrotParser,                             \
-	PascalParser, \
-	PerlParser, \
-	PhpParser, \
-  ProtobufParser,                           \
-	PythonParser, \
-	RexxParser, \
-	RubyParser, \
-	SchemeParser, \
-	ShParser, \
-	SlangParser, \
-	SmlParser, \
-	SqlParser, \
-	TclParser, \
-	TexParser, \
-	VeraParser, \
-	VerilogParser, \
-	VhdlParser, \
-	VimParser, \
-	YaccParser
+#define PARSER_LIST                             \
+  ActionScriptParser,                           \
+    AdaParser,                                  \
+    AntParser,                                  \
+    AsmParser,                                  \
+    AsnParser,                                  \
+    AspParser,                                  \
+    AwkParser,                                  \
+    BasicParser,                                \
+    BetaParser,                                 \
+    CParser,                                    \
+    CppParser,                                  \
+    CsharpParser,                               \
+    CobolParser,                                \
+    DParser,                                    \
+    DosBatchParser,                             \
+    EiffelParser,                               \
+    ErlangParser,                               \
+    FlexParser,                                 \
+    FalconParser,                               \
+    FortranParser,                              \
+    GoParser,                                   \
+    HtmlParser,                                 \
+    JavaParser,                                 \
+    JavaScriptParser,                           \
+    LispParser,                                 \
+    LuaParser,                                  \
+    MakefileParser,                             \
+    MatLabParser,                               \
+    ObjcParser ,                                \
+    OcamlParser,                                \
+    ParrotParser,                               \
+    PascalParser,                               \
+    PerlParser,                                 \
+    PhpParser,                                  \
+    ProtobufParser,                             \
+    PythonParser,                               \
+    RexxParser,                                 \
+    RubyParser,                                 \
+    SchemeParser,                               \
+    ShParser,                                   \
+    SlangParser,                                \
+    SmlParser,                                  \
+    SqlParser,                                  \
+    TclParser,                                  \
+    TexParser,                                  \
+    VeraParser,                                 \
+    VerilogParser,                              \
+    VhdlParser,                                 \
+    VimParser,                                  \
+    YaccParser
 
 #endif  /* _PARSERS_H */
 

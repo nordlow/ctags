@@ -9,6 +9,7 @@ HEADERS = \
 
 SOURCES = \
 	args.c \
+	actionscript.c \
 	ada.c \
 	ant.c \
 	asm.c \
@@ -78,6 +79,7 @@ REGEX_HEADERS = gnu_regex/regex.h
 
 OBJECTS = \
 	args.$(OBJEXT) \
+	actionscript.$(OBJEXT) \
 	ada.$(OBJEXT) \
 	ant.$(OBJEXT) \
 	asm.$(OBJEXT) \
