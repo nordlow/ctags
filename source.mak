@@ -42,6 +42,7 @@ SOURCES = \
 	pascal.c \
 	perl.c \
 	php.c \
+	protobuf.c \
 	python.c \
 	read.c \
 	rexx.c \
@@ -107,6 +108,7 @@ OBJECTS = \
 	pascal.$(OBJEXT) \
 	perl.$(OBJEXT) \
 	php.$(OBJEXT) \
+	protobuf.$(OBJEXT) \
 	python.$(OBJEXT) \
 	read.$(OBJEXT) \
 	rexx.$(OBJEXT) \

@@ -22,11 +22,19 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_FUNCTION
+	K_FUNCTION,
+	K_ALIAS,
+	K_VARIABLE,
+	K_CONSTANT,
+	K_MACRO
 } lispKind;
 
 static kindOption LispKinds [] = {
-	{ TRUE, 'f', "function", "functions" }
+	{ TRUE, 'f', "function", "functions" },
+	{ TRUE, 'a', "alias", "aliases" },
+	{ TRUE, 'v', "variable", "variables" },
+	{ TRUE, 'c', "constant", "constants" },
+	{ TRUE, 'm', "macro",    "macros"  },
 };
 
 /*
@@ -39,9 +47,9 @@ static kindOption LispKinds [] = {
  */
 static int L_isdef (const unsigned char *strp)
 {
-	return ( (strp [1] == 'd' || strp [1] == 'D')
-		  && (strp [2] == 'e' || strp [2] == 'E')
-		  && (strp [3] == 'f' || strp [3] == 'F'));
+	return ( (strp [1] == 'd' || strp [1] == 'D') &&
+           (strp [2] == 'e' || strp [2] == 'E') &&
+           (strp [3] == 'f' || strp [3] == 'F'));
 }
 
 static int L_isquote (const unsigned char *strp)
