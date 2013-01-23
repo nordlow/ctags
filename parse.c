@@ -38,8 +38,7 @@ static unsigned int LanguageCount = 0;
  *   FUNCTION DEFINITIONS
  */
 
-extern void makeSimpleTag (
-                           const vString* const name, kindOption* const kinds, const int kind)
+extern void makeSimpleTag(const vString* const name, kindOption* const kinds, const int kind)
 {
 	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{

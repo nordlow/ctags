@@ -6,7 +6,7 @@
 # These are the names of the installed programs, in case you wish to change
 # them.
 #
-CTAGS_PROG = ctags-exuberant
+CTAGS_PROG = ctags
 ETAGS_PROG = etags
 
 # Set this to the path to your shell (must run Bourne shell commands).
@@ -18,7 +18,7 @@ SHELL = /bin/sh
 #
 exec_prefix = ${prefix}
 datarootdir = ${prefix}/share
-prefix	= /home/per/alt/$(shell config.guess)
+prefix	= /home/per/opt/x86_64-unknown-linux-gnu/ctags-ng
 bindir	= ${exec_prefix}/bin
 srcdir	= .
 libdir	= ${exec_prefix}/lib
@@ -28,10 +28,10 @@ SLINK	= ln -s
 STRIP	= strip
 CC	= gcc
 DEFS	= -DHAVE_CONFIG_H
-CFLAGS	= -O3 -lto
-LDFLAGS	= -s
-LIBS	=
-EXEEXT	=
+CFLAGS	= -g -O2
+LDFLAGS	= 
+LIBS	= 
+EXEEXT	= 
 OBJEXT	= o
 
 # If you cannot run the "configure" script to set the variables above, then
@@ -70,7 +70,7 @@ READ_INC = readtags.h
 MANPAGE	= ctags.1
 
 AUTO_GEN   = configure config.h.in
-CONFIG_GEN = config.cache config.log config.status config.run config.h Makefile source.mak
+CONFIG_GEN = config.cache config.log config.status config.run config.h Makefile
 
 #
 # names for installed man pages
@@ -97,23 +97,23 @@ DEST_EMAN	= $(man1dir)/$(EMAN)
 #
 all: $(CTAGS_EXEC) $(READ_LIB)
 
-$(CTAGS_EXEC): $(OBJECTS) Makefile source.mak
+$(CTAGS_EXEC): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
-dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS) Makefile source.mak
+dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
 	$(CC) -I. -I$(srcdir) $(DEFS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
 
-readtags$(EXEEXT): readtags.c readtags.h Makefile source.mak
+readtags$(EXEEXT): readtags.c readtags.h
 	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) $(DEFS) $(CFLAGS) $(LDFLAGS) -o $@ readtags.c
 
 ETYPEREF_OBJS = etyperef.o keyword.o routines.o strlist.o vstring.o
-etyperef$(EXEEXT): $(ETYPEREF_OBJS) Makefile source.mak
+etyperef$(EXEEXT): $(ETYPEREF_OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(ETYPEREF_OBJS)
 
-etyperef.o: eiffel.c Makefile source.mak
+etyperef.o: eiffel.c
 	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(CFLAGS) -o $@ -c eiffel.c
 
-$(OBJECTS): $(HEADERS) config.h Makefile source.mak
+$(OBJECTS): $(HEADERS) config.h
 
 #
 # generic install rules
@@ -138,10 +138,10 @@ install-cbin: $(DEST_CTAGS)
 install-ebin: $(DEST_ETAGS)
 install-lib: $(DEST_READ_LIB) $(DEST_READ_INC)
 
-$(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE Makefile source.mak
+$(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE
 	$(INSTALL_PROG) $(CTAGS_EXEC) $@  &&  chmod 755 $@
 
-$(DEST_ETAGS): Makefile source.mak
+$(DEST_ETAGS):
 	- if [ -x $(DEST_CTAGS) ]; then \
 	    cd $(bindir) && $(SLINK) $(CTAGS_EXEC) $(ETAGS_EXEC); \
 	fi
@@ -191,20 +191,17 @@ uninstall-ctags:
 uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
-ECTAGS_LANGS = Make,C,C++,Pascal,Sh,Ada,D,Lisp,Go,Protobuf
-TAGS_FILES = *.[ch] Makefile
-
 #
 # miscellaneous rules
 #
 tags: $(CTAGS_EXEC)
-	./$(CTAGS_EXEC) --sort=yes --links=no --excmd=number --languages=$(ECTAGS_LANGS) --extra=+f --file-scope=yes --fields=afikmsSt --totals=yes $(TAGS_FILES)
+	./$(CTAGS_EXEC) $(srcdir)/*
 
 TAGS: $(CTAGS_EXEC)
-	./$(CTAGS_EXEC) --sort=yes --links=no --excmd=number --languages=$(ECTAGS_LANGS) --extra=+f --file-scope=yes --fields=afikmsSt --totals=yes -e $(TAGS_FILES)
+	./$(CTAGS_EXEC) -e $(srcdir)/*
 
 clean:
-	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB)
+	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
 	rm -f dctags$(EXEEXT) readtags$(EXEEXT)
 	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 
@@ -219,7 +216,7 @@ maintainerclean: distclean
 #
 # implicit rules
 #
-.c.$(OBJEXT): Makefile source.mak
+.c.$(OBJEXT):
 	$(CC) -I. -I$(srcdir) $(DEFS) $(CFLAGS) -c $<
 
 # vi:set tabstop=8:
