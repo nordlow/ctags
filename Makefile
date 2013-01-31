@@ -18,7 +18,7 @@ SHELL = /bin/sh
 #
 exec_prefix = ${prefix}
 datarootdir = ${prefix}/share
-prefix	= /home/per/opt/x86_64-unknown-linux-gnu/ctags-ng
+prefix	= /usr/local
 bindir	= ${exec_prefix}/bin
 srcdir	= .
 libdir	= ${exec_prefix}/lib
@@ -28,10 +28,10 @@ SLINK	= ln -s
 STRIP	= strip
 CC	= gcc
 DEFS	= -DHAVE_CONFIG_H
-CFLAGS	= -g -O2
-LDFLAGS	= 
-LIBS	= 
-EXEEXT	= 
+CFLAGS	= -g
+LDFLAGS	=
+LIBS	=
+EXEEXT	=
 OBJEXT	= o
 
 # If you cannot run the "configure" script to set the variables above, then
@@ -201,7 +201,7 @@ TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
 clean:
-	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
+	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB)
 	rm -f dctags$(EXEEXT) readtags$(EXEEXT)
 	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 
