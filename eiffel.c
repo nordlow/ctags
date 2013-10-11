@@ -856,7 +856,7 @@ static void parseGeneric (tokenInfo *const token, boolean declaration __unused__
 	} while (depth > 0);
 }
 
-static boolean parseType (tokenInfo *const token)
+static boolean parseType (tokenInfo* token)
 {
 	tokenInfo* const id = newToken ();
 	copyToken (id, token);
