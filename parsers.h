@@ -16,7 +16,7 @@
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
-    AdaParser, \
+	AdaParser, \
 	AntParser, \
 	AsmParser, \
 	AspParser, \
@@ -27,13 +27,13 @@
 	CppParser, \
 	CsharpParser, \
 	CobolParser, \
-  DParser, \
+        DParser, \
 	DosBatchParser, \
 	EiffelParser, \
 	ErlangParser, \
 	FlexParser, \
 	FortranParser, \
-  GoParser,  \
+        GoParser,  \
 	HtmlParser, \
 	JavaParser, \
 	JavaScriptParser, \

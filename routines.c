@@ -757,13 +757,21 @@ extern char* absoluteFilename (const char *file)
 				else if (cp [0] != PATH_SEPARATOR)
 					cp = slashp;
 #endif
+/* <<<<<<< HEAD */
 				strcpy (cp, slashp + 3);
+/* ======= */
+/* 				memmove (cp, slashp + 3, strlen (slashp + 3) + 1); */
+/* >>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e */
 				slashp = cp;
 				continue;
 			}
 			else if (slashp [2] == PATH_SEPARATOR  ||  slashp [2] == '\0')
 			{
+/* <<<<<<< HEAD */
 				strcpy (slashp, slashp + 2);
+/* ======= */
+/* 				memmove (slashp, slashp + 2, strlen (slashp + 2) + 1); */
+/* >>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e */
 				continue;
 			}
 		}

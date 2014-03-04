@@ -52,7 +52,7 @@ typedef enum {
 static kindOption ObjcKinds[] = {
 	{TRUE, 'i', "interface", "class interface"},
 	{TRUE, 'I', "implementation", "class implementation"},
-	{TRUE, 'p', "protocol", "Protocol"},
+	{TRUE, 'P', "protocol", "Protocol"},
 	{TRUE, 'm', "method", "Object's method"},
 	{TRUE, 'c', "class", "Class' method"},
 	{TRUE, 'v', "var", "Global variable"},
@@ -432,16 +432,16 @@ typedef void (*parseNext) (vString * const ident, objcToken what);
 /********** Helpers */
 /* This variable hold the 'parser' which is going to
  * handle the next token */
-parseNext toDoNext;
+static parseNext toDoNext;
 
 /* Special variable used by parser eater to
  * determine which action to put after their
  * job is finished. */
-parseNext comeAfter;
+static parseNext comeAfter;
 
 /* Used by some parsers detecting certain token
  * to revert to previous parser. */
-parseNext fallback;
+static parseNext fallback;
 
 
 /********** Grammar */
@@ -452,6 +452,9 @@ static vString *tempName = NULL;
 static vString *parentName = NULL;
 static objcKind parentType = K_INTERFACE;
 
+static unsigned long tokenLine;
+static fpos_t filePosition;     /* file position of line containing tag */
+static void parseMethodsImplemName (vString * const ident, objcToken what);
 /* used to prepare tag for OCaml, just in case their is a need to
  * add additional information to the tag. */
 static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
@@ -460,6 +463,12 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 	tag->kindName = ObjcKinds[kind].name;
 	tag->kind = ObjcKinds[kind].letter;
 
+	if (toDoNext == &parseMethodsImplemName)
+	{
+		tag->lineNumber = tokenLine;
+		tag->filePosition = filePosition;
+	}
+
 	if (parentName != NULL)
 	{
 		tag->extensionFields.scope[0] = ObjcKinds[parentType].name;
@@ -467,13 +476,13 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 	}
 }
 
-void pushEnclosingContext (const vString * parent, objcKind type)
+static void pushEnclosingContext (const vString * parent, objcKind type)
 {
 	vStringCopy (parentName, parent);
 	parentType = type;
 }
 
-void popEnclosingContext ()
+static void popEnclosingContext (void)
 {
 	vStringClear (parentName);
 }
@@ -487,7 +496,7 @@ static void addTag (vString * const ident, int kind)
 	makeTagEntry (&toCreate);
 }
 
-objcToken waitedToken, fallBackToken;
+static objcToken waitedToken, fallBackToken;
 
 /* Ignore everything till waitedToken and jump to comeAfter.
  * If the "end" keyword is encountered break, doesn't remember
@@ -508,22 +517,22 @@ static void tillTokenOrFallBack (vString * const UNUSED (ident), objcToken what)
 	}
 }
 
+static int ignoreBalanced_count = 0;
 static void ignoreBalanced (vString * const UNUSED (ident), objcToken what)
 {
-	static int count = 0;
 
 	switch (what)
 	{
 	case Tok_PARL:
 	case Tok_CurlL:
 	case Tok_SQUAREL:
-		count++;
+                ignoreBalanced_count++;
 		break;
 
 	case Tok_PARR:
 	case Tok_CurlR:
 	case Tok_SQUARER:
-		count--;
+		ignoreBalanced_count--;
 		break;
 
 	default:
@@ -531,7 +540,7 @@ static void ignoreBalanced (vString * const UNUSED (ident), objcToken what)
 		break;
 	}
 
-	if (count == 0)
+	if (ignoreBalanced_count == 0)
 		toDoNext = comeAfter;
 }
 
@@ -549,14 +558,12 @@ static void parseFields (vString * const ident, objcToken what)
 		comeAfter = &parseFields;
 		break;
 
-		// we got an identifier, keep track
-		// of it
+		/* we got an identifier, keep track of it */
 	case ObjcIDENTIFIER:
 		vStringCopy (tempName, ident);
 		break;
 
-		// our last kept identifier must be our
-		// variable name =)
+		/* our last kept identifier must be our variable name =) */
 	case Tok_semi:
 		addTag (tempName, K_FIELD);
 		vStringClear (tempName);
@@ -596,7 +603,7 @@ static void parseMethodsName (vString * const ident, objcToken what)
 
 	case Tok_CurlL:
 	case Tok_semi:
-		// method name is not simple
+		/* method name is not simple */
 		if (vStringLength (fullMethodName) != '\0')
 		{
 			addTag (fullMethodName, methodKind);
@@ -632,12 +639,17 @@ static void parseMethodsImplemName (vString * const ident, objcToken what)
 		break;
 
 	case ObjcIDENTIFIER:
+		if (vStringLength (fullMethodName) == '\0')
+		{
+			tokenLine = getInputLineNumber();
+			filePosition = getInputFilePosition();
+		}
 		vStringCopy (prevIdent, ident);
 		break;
 
 	case Tok_CurlL:
 	case Tok_semi:
-		// method name is not simple
+		/* method name is not simple */
 		if (vStringLength (fullMethodName) != '\0')
 		{
 			addTag (fullMethodName, methodKind);
@@ -696,17 +708,16 @@ static void parseProperty (vString * const ident, objcToken what)
 		waitedToken = Tok_PARR;
 		break;
 
-		// we got an identifier, keep track
-		// of it
+		/* we got an identifier, keep track of it */
 	case ObjcIDENTIFIER:
 		vStringCopy (tempName, ident);
 		break;
 
-		// our last kept identifier must be our
-		// variable name =)
+		/* our last kept identifier must be our variable name =) */
 	case Tok_semi:
 		addTag (tempName, K_PROPERTY);
 		vStringClear (tempName);
+		toDoNext = &parseMethods;
 		break;
 
 	default:
@@ -799,8 +810,9 @@ static void parseStructMembers (vString * const ident, objcToken what)
 		vStringClear (tempName);
 		break;
 
-		// some types are complex, the only one
-		// we will loose is the function type.
+		/* some types are complex, the only one
+		 * we will loose is the function type.
+		 */
 	case Tok_CurlL:	/* '{' */
 	case Tok_PARL:	/* '(' */
 	case Tok_SQUAREL:	/* '[' */
@@ -821,6 +833,7 @@ static void parseStructMembers (vString * const ident, objcToken what)
 }
 
 /* Called just after the struct keyword */
+<<<<<<< HEAD
 static void parseStruct (vString * const ident, objcToken what)
 {
 	static boolean gotName = FALSE;
@@ -837,6 +850,23 @@ static void parseStruct (vString * const ident, objcToken what)
 		else
 		{
 			gotName = FALSE;
+=======
+static boolean parseStruct_gotName = FALSE;
+static void parseStruct (vString * const ident, objcToken what)
+{
+	switch (what)
+	{
+	case ObjcIDENTIFIER:
+		if (!parseStruct_gotName)
+		{
+			addTag (ident, K_STRUCT);
+			pushEnclosingContext (ident, K_STRUCT);
+			parseStruct_gotName = TRUE;
+		}
+		else
+		{
+			parseStruct_gotName = FALSE;
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 			popEnclosingContext ();
 			toDoNext = comeAfter;
 			comeAfter (ident, what);
@@ -850,7 +880,11 @@ static void parseStruct (vString * const ident, objcToken what)
 		/* maybe it was just a forward declaration
 		 * in which case, we pop the context */
 	case Tok_semi:
+<<<<<<< HEAD
 		if (gotName)
+=======
+		if (parseStruct_gotName)
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 			popEnclosingContext ();
 
 		toDoNext = comeAfter;
@@ -864,6 +898,7 @@ static void parseStruct (vString * const ident, objcToken what)
 }
 
 /* Parse enumeration members, ignoring potential initialization */
+<<<<<<< HEAD
 static void parseEnumFields (vString * const ident, objcToken what)
 {
 	static parseNext prev = NULL;
@@ -872,13 +907,26 @@ static void parseEnumFields (vString * const ident, objcToken what)
 	{
 		comeAfter = prev;
 		prev = NULL;
+=======
+static parseNext parseEnumFields_prev = NULL;
+static void parseEnumFields (vString * const ident, objcToken what)
+{
+	if (parseEnumFields_prev != NULL)
+	{
+		comeAfter = parseEnumFields_prev;
+		parseEnumFields_prev = NULL;
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 	}
 
 	switch (what)
 	{
 	case ObjcIDENTIFIER:
 		addTag (ident, K_ENUM);
+<<<<<<< HEAD
 		prev = comeAfter;
+=======
+		parseEnumFields_prev = comeAfter;
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 		waitedToken = Tok_COMA;
 		/* last item might not have a coma */
 		fallBackToken = Tok_CurlR;
@@ -899,6 +947,7 @@ static void parseEnumFields (vString * const ident, objcToken what)
 }
 
 /* parse enum ... { ... */
+<<<<<<< HEAD
 static void parseEnum (vString * const ident, objcToken what)
 {
 	static boolean named = FALSE;
@@ -915,6 +964,23 @@ static void parseEnum (vString * const ident, objcToken what)
 		else
 		{
 			named = FALSE;
+=======
+static boolean parseEnum_named = FALSE;
+static void parseEnum (vString * const ident, objcToken what)
+{
+	switch (what)
+	{
+	case ObjcIDENTIFIER:
+		if (!parseEnum_named)
+		{
+			addTag (ident, K_ENUM);
+			pushEnclosingContext (ident, K_ENUM);
+			parseEnum_named = TRUE;
+		}
+		else
+		{
+			parseEnum_named = FALSE;
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 			popEnclosingContext ();
 			toDoNext = comeAfter;
 			comeAfter (ident, what);
@@ -923,11 +989,19 @@ static void parseEnum (vString * const ident, objcToken what)
 
 	case Tok_CurlL:	/* '{' */
 		toDoNext = &parseEnumFields;
+<<<<<<< HEAD
 		named = FALSE;
 		break;
 
 	case Tok_semi:	/* ';' */
 		if (named)
+=======
+		parseEnum_named = FALSE;
+		break;
+
+	case Tok_semi:	/* ';' */
+		if (parseEnum_named)
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 			popEnclosingContext ();
 		toDoNext = comeAfter;
 		comeAfter (ident, what);
@@ -974,6 +1048,7 @@ static void parseTypedef (vString * const ident, objcToken what)
 	}
 }
 
+<<<<<<< HEAD
 static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
 {
 	static boolean escaped = FALSE;
@@ -988,6 +1063,21 @@ static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
 		if (escaped)
 		{
 			escaped = FALSE;
+=======
+static boolean ignorePreprocStuff_escaped = FALSE;
+static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
+{
+	switch (what)
+	{
+	case Tok_Backslash:
+		ignorePreprocStuff_escaped = TRUE;
+		break;
+
+	case Tok_EOL:
+		if (ignorePreprocStuff_escaped)
+		{
+			ignorePreprocStuff_escaped = FALSE;
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 		}
 		else
 		{
@@ -996,7 +1086,11 @@ static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
 		break;
 
 	default:
+<<<<<<< HEAD
 		escaped = FALSE;
+=======
+		ignorePreprocStuff_escaped = FALSE;
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 		break;
 	}
 }
@@ -1105,6 +1199,20 @@ static void findObjcTags (void)
 	fullMethodName = vStringNew ();
 	prevIdent = vStringNew ();
 
+<<<<<<< HEAD
+=======
+	/* (Re-)initialize state variables, this might be a second file */
+	comeAfter = NULL;
+	fallback = NULL;
+	parentType = K_INTERFACE;
+	ignoreBalanced_count = 0;
+	methodKind = 0;
+	parseStruct_gotName = FALSE;
+	parseEnumFields_prev = NULL;
+	parseEnum_named = FALSE;
+	ignorePreprocStuff_escaped = FALSE;
+
+>>>>>>> f039977edb44f3d46aacd26cc486ce153b879b0e
 	st.name = vStringNew ();
 	st.cp = fileReadLine ();
 	toDoNext = &globalScope;

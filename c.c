@@ -92,18 +92,18 @@ typedef enum eKeywordId {
 	KEYWORD_USING,
 	KEYWORD_VIRTUAL, KEYWORD_VOID, KEYWORD_VOLATILE,
 	KEYWORD_WCHAR_T, KEYWORD_WHILE,
-    KEYWORD_ALIGN, KEYWORD_ASM, KEYWORD_ASSERT, KEYWORD_AUTO, 
-    KEYWORD_BODY, KEYWORD_BOOL, KEYWORD_BREAK, KEYWORD_CAST, 
-    KEYWORD_CDOUBLE, KEYWORD_CENT, KEYWORD_CFLOAT, KEYWORD_CONTINUE, 
-    KEYWORD_CREAL, KEYWORD_DCHAR, KEYWORD_DEBUG, 
-    KEYWORD_DEPRECATED, KEYWORD_EXPORT, KEYWORD_FALSE, KEYWORD_FINALLY, 
-    KEYWORD_FOREACH_REVERSE, KEYWORD_IDOUBLE, KEYWORD_IFLOAT, 
-    KEYWORD_IN, KEYWORD_INVARIANT, KEYWORD_IREAL, KEYWORD_IS, 
-    KEYWORD_LAZY, KEYWORD_MIXIN, KEYWORD_MODULE, KEYWORD_NULL, 
-    KEYWORD_OUT, KEYWORD_PRAGMA, KEYWORD_REAL, KEYWORD_SCOPE, 
-    KEYWORD_SUPER, KEYWORD_TRUE, KEYWORD_TYPEID, KEYWORD_TYPEOF, 
-    KEYWORD_UBYTE, KEYWORD_UCENT, KEYWORD_UNITTEST, KEYWORD_VERSION, 
-    KEYWORD_WCHAR, KEYWORD_WITH
+        KEYWORD_ALIGN, KEYWORD_ASM, KEYWORD_ASSERT, KEYWORD_AUTO,
+        KEYWORD_BODY, KEYWORD_BOOL, KEYWORD_BREAK, KEYWORD_CAST,
+        KEYWORD_CDOUBLE, KEYWORD_CENT, KEYWORD_CFLOAT, KEYWORD_CONTINUE,
+        KEYWORD_CREAL, KEYWORD_DCHAR, KEYWORD_DEBUG,
+        KEYWORD_DEPRECATED, KEYWORD_EXPORT, KEYWORD_FALSE, KEYWORD_FINALLY,
+        KEYWORD_FOREACH_REVERSE, KEYWORD_IDOUBLE, KEYWORD_IFLOAT,
+        KEYWORD_IN, KEYWORD_INVARIANT, KEYWORD_IREAL, KEYWORD_IS,
+        KEYWORD_LAZY, KEYWORD_MIXIN, KEYWORD_MODULE, KEYWORD_NULL,
+        KEYWORD_OUT, KEYWORD_PRAGMA, KEYWORD_REAL, KEYWORD_SCOPE,
+        KEYWORD_SUPER, KEYWORD_TRUE, KEYWORD_TYPEID, KEYWORD_TYPEOF,
+        KEYWORD_UBYTE, KEYWORD_UCENT, KEYWORD_UNITTEST, KEYWORD_VERSION,
+        KEYWORD_WCHAR, KEYWORD_WITH
 } keywordId;
 
 /*  Used to determine whether keyword is valid for the current language and
@@ -1602,7 +1602,7 @@ static void readPackageName (tokenInfo *const token, const int firstChar)
 static void readPackageOrNamespace (statementInfo *const st, const declType declaration)
 {
 	st->declaration = declaration;
-	
+
 	if (declaration == DECL_NAMESPACE && !isLanguage (Lang_csharp))
 	{
 		/* In C++ a namespace is specified one level at a time. */
@@ -1877,19 +1877,18 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_VERSION:	readVersion(st); 						break;
 		case KEYWORD_VIRTUAL:   st->implementation = IMP_VIRTUAL;       break;
 		case KEYWORD_WCHAR_T:   st->declaration = DECL_BASE;            break;
-		case KEYWORD_TEMPLATE: 	
+		case KEYWORD_TEMPLATE:
 			if(isLanguage(Lang_d))
 				st->declaration = DECL_TEMPLATE;
 			break;
 		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE); break;
 		case KEYWORD_MODULE:
 		case KEYWORD_PACKAGE:   readPackageOrNamespace (st, DECL_PACKAGE);   break;
-		
+
 		case KEYWORD_EVENT:
 			if (isLanguage (Lang_csharp))
 				st->declaration = DECL_EVENT;
 			break;
-		
 		case KEYWORD_ALIAS:
 		case KEYWORD_TYPEDEF:
 			reinitStatement (st, FALSE);
@@ -2207,7 +2206,7 @@ static void parseJavaAnnotation (statementInfo *const st)
 	 * But watch out for "@interface"!
 	 */
 	tokenInfo *const token = activeToken (st);
-	
+
 	int c = skipToNonWhite ();
 	readIdentifier (token, c);
 	if (token->keyword == KEYWORD_INTERFACE)
@@ -2241,6 +2240,9 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 
 		switch (c)
 		{
+			case '^':
+				break;
+
 			case '&':
 			case '*':
 				info->isPointer = TRUE;
@@ -2610,7 +2612,7 @@ static void parseIdentifier (statementInfo *const st, const int c)
 static void parseGeneralToken (statementInfo *const st, const int c)
 {
 	const tokenInfo *const prev = prevToken (st, 1);
-	
+
 	if (isident1 (c) || (isLanguage (Lang_java) && isHighChar (c)))
 	{
 		parseIdentifier (st, c);
@@ -2827,7 +2829,7 @@ static void tagCheck (statementInfo *const st)
 						st->declaration = DECL_FUNCTION;
 					if (isType (prev2, TOKEN_NAME))
 						copyToken (st->blockName, prev2);
-					
+
 					if( st->declaration == DECL_CLASS)
 						qualifyBlockTag (st, prev2);
 					else
@@ -2977,6 +2979,7 @@ static void initializeCParser (const langType language)
 	Lang_c = language;
 	buildKeywordHash (language, 0);
 }
+
 static void initializeCppParser (const langType language)
 {
 	Lang_cpp = language;
@@ -2994,7 +2997,6 @@ static void initializeDParser (const langType language)
 	Lang_d = language;
 	buildKeywordHash (language, 3);
 }
-
 
 static void initializeJavaParser (const langType language)
 {
@@ -3030,8 +3032,8 @@ extern parserDefinition* DParser (void)
      def->parser2    = findCTags;
      def->initialize = initializeDParser;
 	return def;
-} 
- 
+}
+
 extern parserDefinition* CppParser (void)
 {
 	static const char *const extensions [] = {

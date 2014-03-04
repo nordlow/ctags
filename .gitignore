@@ -2,7 +2,10 @@
 config.h
 config.log
 config.status
-ctags
 .undo
 autom4te.cache
 config.h.in
+Makefile
+autom4te.cache/
+configure
+ctags

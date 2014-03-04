@@ -395,6 +395,8 @@ static char *parseArglist(const char *buf)
 {
 	char *start, *end;
 	int level;
+	/* char *arglist, *from, *to; */
+	/* int len; */
 	if (NULL == buf)
 		return NULL;
 	if (NULL == (start = strchr(buf, '(')))
@@ -410,6 +412,19 @@ static char *parseArglist(const char *buf)
 	}
 	*end = '\0';
 	return strdup(start);
+	/* len = strlen(start) + 1; */
+	/* arglist = eMalloc(len); */
+	/* from = start; */
+	/* to = arglist; */
+	/* while (*from != '\0') { */
+	/* 	if (*from == '\t') */
+	/* 		; /\* tabs are illegal in field values *\/ */
+	/* 	else */
+	/* 		*to++ = *from; */
+	/* 	++from; */
+	/* } */
+	/* *to = '\0'; */
+	/* return arglist; */
 }
 
 static void parseFunction (const char *cp, vString *const def,
@@ -727,7 +742,6 @@ static void findPythonTags (void)
 			find_triple_end(cp, &longStringLiteral);
 			continue;
 		}
-
 		checkParent(nesting_levels, indent, parent);
 
 		/* Deal with multiline string start. */
@@ -824,7 +838,6 @@ static void findPythonTags (void)
 				/* skip variables in methods */
 				if (! parent_is_class && vStringLength(parent) > 0)
 					continue;
-
 				makeVariableTag (name, parent);
 			}
 		}
