@@ -26,9 +26,9 @@ incdir	= ${prefix}/include
 mandir	= ${datarootdir}/man
 SLINK	= ln -s
 STRIP	= strip
-CC	= clang
+CC	= cc
 DEFS	= -DHAVE_CONFIG_H
-CFLAGS	= -g -O2
+CFLAGS	= -g -O2 -Wall -Wextra
 LDFLAGS	=
 LIBS	=
 EXEEXT	=
@@ -113,7 +113,7 @@ etyperef$(EXEEXT): $(ETYPEREF_OBJS)
 etyperef.o: eiffel.c
 	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(CFLAGS) -o $@ -c eiffel.c
 
-$(OBJECTS): $(HEADERS) config.h
+$(OBJECTS): $(HEADERS) config.h Makefile $(srcdir)/source.mak
 
 #
 # generic install rules
